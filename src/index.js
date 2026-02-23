@@ -249,9 +249,21 @@ async function registrarPonto(page) {
     // Clica no botão
     await button.click();
     logger.info(`Botão de ponto clicado (ID: ${buttonId})`);
-    
-    await sleep(2000);
+
+    logger.info('Aguardando confirmação de sucesso: "Registro confirmado"...');
+    await page.waitForFunction(
+      () => {
+        const root = document.body || document.documentElement;
+        const text = (root?.innerText || root?.textContent || '').toLowerCase();
+        // Observação: às vezes a UI inclui espaço no final ("Registro confirmado ")
+        return text.includes('registro confirmado');
+      },
+      { timeout: config.timeout }
+    );
+
+    await sleep(500);
     await debugScreenshot(page, '06-ponto-registrado');
+    logger.info('Confirmação encontrada: "Registro confirmado".');
     return true;
   } catch (err) {
     logger.error(`Erro ao encontrar/clicar no botão ${buttonId}: ${err.message}`);
