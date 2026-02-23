@@ -380,6 +380,10 @@ const RETRY_DELAY = 30_000; // 30 segundos
 async function main() {
   logger.info('=== Iniciando automação de ponto MarqPonto ===');
 
+  const now = new Date();
+  const horaLocal = now.toLocaleString('pt-BR', { timeZoneName: 'short' });
+  logger.info(`Hora local atual (browser/runner): ${horaLocal}`);
+
   await runMonthlyLogCleanup();
 
   if (!config.user || !config.password) {
