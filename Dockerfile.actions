@@ -1,0 +1,17 @@
+FROM ghcr.io/puppeteer/puppeteer:latest
+
+# Configura timezone para America/Manaus
+USER root
+RUN apt-get update && apt-get install -y tzdata && rm -rf /var/lib/apt/lists/*
+ENV TZ=America/Manaus
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+CMD ["node", "src/index.js"]
+

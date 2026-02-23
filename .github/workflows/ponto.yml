@@ -19,22 +19,16 @@ on:
 jobs:
   bater-ponto:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+      - name: Build container (TZ America/Manaus)
+        run: docker build -f Dockerfile.actions -t marqponto-automation:tz-manaus .
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ponto automation
+      - name: Run ponto automation (inside container)
         env:
           SISTEMA_PONTO: ${{ vars.SISTEMA_PONTO }}
           LOGIN_URL: ${{ vars.LOGIN_URL }}
@@ -49,11 +43,32 @@ jobs:
           MARQPONTO_USER: ${{ secrets.MARQPONTO_USER }}
           MARQPONTO_PASS: ${{ secrets.MARQPONTO_PASS }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}          
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GH_GIST_TOKEN: ${{ secrets.GH_GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
           CI: 'true'
-        run: node src/index.js
+        run: |
+          mkdir -p logs
+          docker run --rm \
+            -e SISTEMA_PONTO \
+            -e LOGIN_URL \
+            -e PONTO_URL \
+            -e GEO_LAT_SEG_TER_QUA \
+            -e GEO_LNG_SEG_TER_QUA \
+            -e GEO_LAT_QUI_SEX \
+            -e GEO_LNG_QUI_SEX \
+            -e HEADLESS \
+            -e DEBUG \
+            -e DRY_RUN \
+            -e MARQPONTO_USER \
+            -e MARQPONTO_PASS \
+            -e TELEGRAM_BOT_TOKEN \
+            -e TELEGRAM_CHAT_ID \
+            -e GH_GIST_TOKEN \
+            -e GIST_ID \
+            -e CI \
+            -v "${PWD}/logs:/app/logs" \
+            marqponto-automation:tz-manaus
 
       - name: Upload debug screenshots
         if: always()
