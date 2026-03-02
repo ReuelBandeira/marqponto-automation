@@ -143,14 +143,14 @@ async function isDisabled(dateStr) {
  */
 async function cleanupPastDates() {
   const dates = await getDisabledDates();
-  // Usa o fuso horário de Brasília para a data atual
-  const nowBrasilia = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-  nowBrasilia.setHours(23, 59, 59, 999); // inclui o dia de hoje
+  // Obtém a data de hoje no fuso Manaus como string 'YYYY-MM-DD' (locale en-CA retorna esse formato)
+  const todayManaus = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Manaus' });
 
   const filtered = dates.filter((d) => {
     const [day, month, year] = d.split('/');
-    const dateObj = new Date(`${year}-${month}-${day}`);
-    return dateObj >= nowBrasilia;
+    // Constrói string ISO para comparação puramente textual — sem objetos Date, sem ambiguidade de timezone
+    const dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    return dateStr >= todayManaus; // mantém datas de hoje e futuras
   });
 
   if (filtered.length !== dates.length) {

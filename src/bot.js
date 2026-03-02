@@ -36,7 +36,7 @@ async function confirmUpdates(updateId) {
   return new Promise((resolve) => {
     https.get(url, (res) => {
       let data = '';
-      res.on('data', () => {});
+      res.on('data', () => { });
       res.on('end', () => resolve());
     }).on('error', () => resolve());
   });
@@ -58,7 +58,7 @@ function parseDate(text) {
  * Retorna a data de hoje no formato DD/MM/YYYY (fuso Brasília)
  */
 function getToday() {
-  return new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+  return new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Manaus' });
 }
 
 /**

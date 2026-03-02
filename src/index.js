@@ -29,11 +29,11 @@ async function debugScreenshot(page, name) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Retorna o horário da batida atual (10:00, 13:00, 14:00 ou 19:00) em Brasília. */
+/** Retorna o horário da batida atual (09:00, 12:00, 13:00 ou 18:00) em Manaus. */
 function getBatidaAtual() {
   const now = new Date();
   const formatter = new Intl.DateTimeFormat('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
+    timeZone: 'America/Manaus',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -42,10 +42,10 @@ function getBatidaAtual() {
   const hour = parseInt(parts.find(p => p.type === 'hour').value, 10);
   const minute = parseInt(parts.find(p => p.type === 'minute').value, 10);
   const totalMinutes = hour * 60 + minute;
-  if (totalMinutes < 12 * 60) return '10:00';   // entrada
-  if (totalMinutes < 14 * 60) return '13:00';  // saída almoço
-  if (totalMinutes < 15 * 60) return '14:00'; // retorno almoço
-  return '19:00';                               // saída
+  if (totalMinutes < 11 * 60) return '09:00';   // entrada
+  if (totalMinutes < 13 * 60) return '12:00';  // saída almoço
+  if (totalMinutes < 14 * 60) return '13:00'; // retorno almoço
+  return '18:00';                               // saída
 }
 
 // ---------------------------------------------------------------------------
@@ -412,7 +412,7 @@ async function main() {
   const todayDisabled = await checkTelegramAndProcess();
 
   if (todayDisabled) {
-    const today = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const today = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Manaus' });
     const batida = getBatidaAtual();
     logger.info(`Ponto desativado para hoje (${today}) — pulando batida ${batida}`);
     const prefixDisabled = config.sistemaPonto ? `${config.sistemaPonto} - ` : '';
