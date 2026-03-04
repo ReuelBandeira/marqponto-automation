@@ -32,8 +32,11 @@ jobs:
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+      - name: Set lowercase owner
+        run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Pull container image (TZ America/Manaus)
-        run: docker pull ghcr.io/${{ github.repository_owner }}/marqponto-automation:tz-manaus
+        run: docker pull ghcr.io/${{ env.OWNER }}/marqponto-automation:tz-manaus
 
       - name: Run ponto automation (inside container)
         env:
@@ -75,7 +78,7 @@ jobs:
             -e GIST_ID \
             -e CI \
             -v "${PWD}/logs:/app/logs" \
-            ghcr.io/${{ github.repository_owner }}/marqponto-automation:tz-manaus
+            ghcr.io/${{ env.OWNER }}/marqponto-automation:tz-manaus
 
       - name: Upload debug screenshots
         if: always()
